@@ -87,7 +87,7 @@ for v := range out1 {
 ```
 
 **Bridge**
-```
+```go
 ch := make(chan (<-chan int))
 go func() {
 	defer close(ch)
