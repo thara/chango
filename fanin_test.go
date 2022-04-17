@@ -2,14 +2,13 @@ package chango
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"runtime"
-	"sort"
+	"testing"
 	"time"
 )
 
-func ExampleFunIn() {
+func BenchmarkFanIn(b *testing.B) {
 	primeFinder := func(ctx context.Context, src <-chan int) <-chan int {
 		ch := make(chan int)
 		go func() {
@@ -48,25 +47,8 @@ func ExampleFunIn() {
 		fanout[i] = primeFinder(ctx, randCh)
 	}
 
-	var result []int
-	for p := range Take(ctx, FanIn(ctx, fanout...), 10) {
-		result = append(result, p)
+	for n := 0; n < b.N; n++ {
+		for range Take(ctx, FanIn(ctx, fanout...), 10) {
+		}
 	}
-
-	sort.Sort(sort.IntSlice(result))
-	for _, v := range result {
-		fmt.Println(v)
-	}
-
-	// Output:
-	// 270059
-	// 931967
-	// 2107939
-	// 2131463
-	// 2393161
-	// 2694161
-	// 2921531
-	// 3108509
-	// 3221269
-	// 3958589
 }
