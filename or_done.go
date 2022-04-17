@@ -1,19 +1,21 @@
 package chango
 
-func OrDone[T any, D any](done <-chan D, src <-chan T) <-chan T {
+import "context"
+
+func OrDone[T any](ctx context.Context, src <-chan T) <-chan T {
 	dst := make(chan T)
 	go func() {
 		defer close(dst)
 		for {
 			select {
-			case <-done:
+			case <-ctx.Done():
 				return
 			case v, ok := <-src:
 				if !ok {
 					return
 				}
 				select {
-				case <-done:
+				case <-ctx.Done():
 				case dst <- v:
 				}
 			}

@@ -1,12 +1,14 @@
 package chango
 
-func Generator[T any, D any](done <-chan D, values ...T) <-chan T {
+import "context"
+
+func Generator[T any](ctx context.Context, values ...T) <-chan T {
 	ch := make(chan T)
 	go func() {
 		defer close(ch)
 		for _, v := range values {
 			select {
-			case <-done:
+			case <-ctx.Done():
 				return
 			case ch <- v:
 			}
@@ -15,14 +17,14 @@ func Generator[T any, D any](done <-chan D, values ...T) <-chan T {
 	return ch
 }
 
-func Repeat[T any, D any](done <-chan D, values ...T) <-chan T {
+func Repeat[T any](ctx context.Context, values ...T) <-chan T {
 	ch := make(chan T)
 	go func() {
 		defer close(ch)
 		for {
 			for _, v := range values {
 				select {
-				case <-done:
+				case <-ctx.Done():
 					return
 				case ch <- v:
 				}
@@ -32,13 +34,13 @@ func Repeat[T any, D any](done <-chan D, values ...T) <-chan T {
 	return ch
 }
 
-func RepeatFn[T any, D any](done <-chan D, fn func() T) <-chan T {
+func RepeatFn[T any](ctx context.Context, fn func() T) <-chan T {
 	ch := make(chan T)
 	go func() {
 		defer close(ch)
 		for {
 			select {
-			case <-done:
+			case <-ctx.Done():
 				return
 			case ch <- fn():
 			}
@@ -47,13 +49,13 @@ func RepeatFn[T any, D any](done <-chan D, fn func() T) <-chan T {
 	return ch
 }
 
-func Take[T any, D any](done <-chan D, src <-chan T, n int) <-chan T {
+func Take[T any](ctx context.Context, src <-chan T, n int) <-chan T {
 	ch := make(chan T)
 	go func() {
 		defer close(ch)
 		for i := 0; i < n; i++ {
 			select {
-			case <-done:
+			case <-ctx.Done():
 				return
 			case ch <- <-src:
 			}

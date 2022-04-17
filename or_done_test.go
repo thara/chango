@@ -12,8 +12,8 @@ func TestOrDone(t *testing.T) {
 	defer cancel()
 
 	rand := func() int { return rand.Int() }
-	src := RepeatFn(ctx.Done(), rand)
+	src := RepeatFn(ctx, rand)
 
-	for range OrDone(ctx.Done(), src) {
+	for range OrDone(ctx, src) {
 	}
 }

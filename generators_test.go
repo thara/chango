@@ -1,18 +1,20 @@
 package chango
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 func ExampleTake() {
-	done := make(chan interface{})
-	defer close(done)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
 
 	rand.Seed(1)
 	rand := func() int { return rand.Int() }
 
-	for n := range Take(done, RepeatFn(done, rand), 10) {
+	for n := range Take(ctx, RepeatFn(ctx, rand), 10) {
 		fmt.Println(n)
 	}
 	// Output:

@@ -1,8 +1,11 @@
 package chango
 
-import "sync"
+import (
+	"context"
+	"sync"
+)
 
-func FunIn[T any, D any](done <-chan D, channels ...<-chan T) <-chan T {
+func FunIn[T any](ctx context.Context, channels ...<-chan T) <-chan T {
 	var wg sync.WaitGroup
 	ch := make(chan T)
 
@@ -10,7 +13,7 @@ func FunIn[T any, D any](done <-chan D, channels ...<-chan T) <-chan T {
 		defer wg.Done()
 		for v := range src {
 			select {
-			case <-done:
+			case <-ctx.Done():
 			case ch <- v:
 			}
 		}

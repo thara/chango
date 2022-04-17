@@ -1,12 +1,16 @@
 package chango
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+	"time"
+)
 
 func ExampleTee() {
-	done := make(chan interface{})
-	defer close(done)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
 
-	out1, out2 := Tee(done, Take(done, Repeat(done, 1, 2), 4))
+	out1, out2 := Tee(ctx, Take(ctx, Repeat(ctx, 1, 2), 4))
 
 	for v := range out1 {
 		fmt.Printf("out1: %v, out2: %v\n", v, <-out2)

@@ -1,6 +1,10 @@
 package chango
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+	"time"
+)
 
 func ExampleBridge() {
 	ch := make(chan (<-chan int))
@@ -14,10 +18,10 @@ func ExampleBridge() {
 		}
 	}()
 
-	done := make(chan interface{})
-	defer close(done)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
 
-	for v := range Bridge(done, ch) {
+	for v := range Bridge(ctx, ch) {
 		fmt.Printf("%v ", v)
 	}
 	// Output:

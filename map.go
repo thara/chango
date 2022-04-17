@@ -1,12 +1,14 @@
 package chango
 
-func Map[T any, D any](done <-chan D, src <-chan T, f func(T) T) <-chan T {
+import "context"
+
+func Map[T any](ctx context.Context, src <-chan T, f func(T) T) <-chan T {
 	dst := make(chan T)
 	go func() {
 		defer close(dst)
 		for v := range src {
 			select {
-			case <-done:
+			case <-ctx.Done():
 				return
 			case dst <- f(v):
 			}
