@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-func FunIn[T any](ctx context.Context, channels ...<-chan T) <-chan T {
+func FanIn[T any](ctx context.Context, channels ...<-chan T) <-chan T {
 	var wg sync.WaitGroup
 	ch := make(chan T)
 
